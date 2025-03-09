@@ -1,49 +1,79 @@
-import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import { generateToken } from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    let { name, email, phone, password } = req.body;
 
-    // Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: "User already exists" });
+    // ✅ Normalize Data
+    email = email.toLowerCase().trim();
+    phone = phone ? phone.toString().trim() : "";
+    name = name.trim();
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // ✅ Validate password security
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long.",
+      });
+    }
 
-    // Create new user
-    user = new User({ name, email, password: hashedPassword });
+    if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least one uppercase letter and one number.",
+      });
+    }
+
+    // ✅ Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // ❌ Remove manual password hashing (Mongoose schema handles it)
+    const user = new User({ name, email, phone, password });
+
+    // ✅ Save user (Mongoose will hash password automatically)
     await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
+// ✅ Login User (Updated)
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
 
-    // Check if user exists
+    // ✅ Normalize Input
+    email = email.toLowerCase().trim();
+    password = password.trim();
+
+    // ✅ Find User
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
-
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
+    }
 
-    // Generate JWT Token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    console.log("🔍 Stored Hashed Password in DB:", user.password);
+    console.log("🔍 User Input Password:", password);
+
+    // ✅ Compare Passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log("🔍 bcrypt.compare() Result:", isMatch);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // ✅ Generate JWT Token
+    const token = generateToken(user);
 
     res.json({
+      message: "Login successful!",
       token,
       user: {
         id: user._id,
@@ -53,6 +83,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Login Error:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

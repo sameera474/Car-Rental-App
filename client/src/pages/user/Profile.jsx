@@ -1,56 +1,49 @@
-import React, { useState } from "react";
-import { Container, TextField, Button, Typography, Paper } from "@mui/material";
-import MainLayout from "../../layouts/MainLayout";
+import React from "react";
+import { Container, Typography, Paper, Avatar, Button } from "@mui/material";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "123-456-7890",
-  });
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  if (!user) {
+    navigate("/login"); // Redirect if not logged in
+    return null;
+  }
 
   return (
-    <MainLayout>
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ padding: 4 }}>
-          <Typography variant="h4" gutterBottom>
-            My Profile
-          </Typography>
-          <TextField
-            fullWidth
-            label="Full Name"
-            name="name"
-            margin="normal"
-            value={user.name}
-            onChange={handleChange}
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            name="email"
-            margin="normal"
-            value={user.email}
-            onChange={handleChange}
-            disabled
-          />
-          <TextField
-            fullWidth
-            label="Phone"
-            name="phone"
-            margin="normal"
-            value={user.phone}
-            onChange={handleChange}
-          />
-          <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-            Update Profile
-          </Button>
-        </Paper>
-      </Container>
-    </MainLayout>
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ padding: 4, textAlign: "center" }}>
+        <Avatar
+          sx={{
+            bgcolor: "secondary.main",
+            width: 80,
+            height: 80,
+            margin: "auto",
+          }}
+        >
+          {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+        </Avatar>
+
+        <Typography variant="h5" sx={{ mt: 2 }}>
+          {user.name}
+        </Typography>
+        <Typography variant="body1">{user.email}</Typography>
+
+        <Button
+          variant="contained"
+          color="error"
+          sx={{ mt: 3 }}
+          onClick={() => {
+            logout();
+            navigate("/");
+          }}
+        >
+          Logout
+        </Button>
+      </Paper>
+    </Container>
   );
 };
 

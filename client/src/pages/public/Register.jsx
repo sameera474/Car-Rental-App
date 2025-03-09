@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Container } from "@mui/material";
-import { Link } from "react-router-dom";
-import MainLayout from "../../layouts/MainLayout";
+import { useNavigate } from "react-router-dom";
+import { registerUser, loginUser } from "../../services/authService";
+import { TextField, Button, Container, Typography, Paper } from "@mui/material";
 
 const Register = () => {
   const [user, setUser] = useState({
@@ -10,24 +10,54 @@ const Register = () => {
     phone: "",
     password: "",
   });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
+  // ✅ Define handleChange function
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
+  const handleRegister = async () => {
+    try {
+      console.log("📤 Sending Data: ", user);
+
+      // ✅ Step 1: Register User
+      const registerResponse = await registerUser(user);
+      console.log("✅ Registration Success: ", registerResponse);
+
+      // ✅ Step 2: Wait 1 second before login (to allow DB processing)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // ✅ Step 3: Login with the same credentials
+      const loginResponse = await loginUser({
+        email: user.email,
+        password: user.password,
+      });
+      console.log("✅ Auto Login Success: ", loginResponse);
+
+      // ✅ Step 4: Redirect to Dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("❌ Registration/Login failed:", err);
+      setError(err.message);
+    }
+  };
+
   return (
-    <MainLayout>
-      <Container maxWidth="xs">
+    <Container maxWidth="xs">
+      <Paper elevation={3} sx={{ padding: 4 }}>
         <Typography variant="h4" gutterBottom textAlign="center">
           Register
         </Typography>
+        {error && <Typography color="error">{error}</Typography>}
         <TextField
           fullWidth
           label="Full Name"
           name="name"
           margin="normal"
           value={user.name}
-          onChange={handleChange}
+          onChange={handleChange} // ✅ Fix: Now defined
         />
         <TextField
           fullWidth
@@ -54,16 +84,17 @@ const Register = () => {
           value={user.password}
           onChange={handleChange}
         />
-        <Button fullWidth variant="contained" color="primary" sx={{ mt: 2 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+          onClick={handleRegister}
+        >
           Register
         </Button>
-        <Box textAlign="center" sx={{ mt: 2 }}>
-          <Typography variant="body2">
-            Already have an account? <Link to="/login">Login</Link>
-          </Typography>
-        </Box>
-      </Container>
-    </MainLayout>
+      </Paper>
+    </Container>
   );
 };
 
