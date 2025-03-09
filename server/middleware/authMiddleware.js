@@ -1,24 +1,32 @@
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/envConfig.js";
+import dotenv from "dotenv";
 
-// ✅ Export the authenticate function
-export const authenticate = (req, res, next) => {
+dotenv.config();
+
+export const authenticateUser = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Unauthorized" });
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (error) {
     res.status(403).json({ message: "Invalid token" });
   }
 };
 
-// ✅ Export the isManager function
 export const isManager = (req, res, next) => {
   if (!req.user || (req.user.role !== "manager" && req.user.role !== "admin")) {
     return res.status(403).json({ message: "Access denied" });
   }
   next();
+};
+
+export const authorizeRole = (roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    next();
+  };
 };

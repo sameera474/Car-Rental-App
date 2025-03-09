@@ -6,14 +6,14 @@ import {
   updateCar,
   deleteCar,
 } from "../controllers/carController.js";
-import { authenticate, isManager } from "../middleware/authMiddleware.js"; // ✅ Ensure correct import
+import { authenticateUser, isManager } from "../middleware/authMiddleware.js"; // ✅ Fixed Import Names
 
 const router = express.Router();
 
 router.get("/", getAvailableCars);
 router.get("/:id", getCarById);
-router.post("/", authenticate, isManager, addCar);
-router.put("/:id", authenticate, isManager, updateCar);
-router.delete("/:id", authenticate, isManager, deleteCar);
+router.post("/", authenticateUser, isManager, addCar);
+router.put("/:id", authenticateUser, isManager, updateCar);
+router.delete("/:id", authenticateUser, isManager, deleteCar);
 
 export default router;

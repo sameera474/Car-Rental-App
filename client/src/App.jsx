@@ -8,6 +8,7 @@ import Login from "./pages/public/Login";
 import Register from "./pages/public/Register";
 import Dashboard from "./pages/user/Dashboard";
 import Profile from "./pages/user/Profile";
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
+        <AppRoutes />
       </Router>
     </AuthProvider>
   );

@@ -3,10 +3,9 @@ import { register, login } from "../controllers/authController.js";
 
 const router = express.Router();
 
-// ✅ Register Route
+// ✅ User & Company Staff Authentication Routes
 router.post("/register", register);
-
-// ✅ Login Route
 router.post("/login", login);
+router.post("/company-login", login); // ✅ Company Staff Login Route
 
 export default router;

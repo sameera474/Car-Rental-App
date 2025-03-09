@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// Navbar Component - Updated to Fix Drawer Visibility
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -24,9 +25,6 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
-  // ✅ Update navbar when user logs in or out
-  useEffect(() => {}, [user]);
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -36,14 +34,6 @@ const Navbar = () => {
     setMobileOpen(false);
     setAnchorEl(null);
     navigate("/");
-  };
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleProfileMenuClose = () => {
-    setAnchorEl(null);
   };
 
   return (
@@ -88,24 +78,20 @@ const Navbar = () => {
                   Available Cars
                 </Button>
 
-                {/* ✅ Profile Avatar */}
-                <IconButton onClick={handleProfileMenuOpen} color="inherit">
+                <IconButton
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                  color="inherit"
+                >
                   <Avatar sx={{ bgcolor: "secondary.main" }}>
                     {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                   </Avatar>
                 </IconButton>
-
-                {/* ✅ Profile Dropdown Menu */}
                 <Menu
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
-                  onClose={handleProfileMenuClose}
+                  onClose={() => setAnchorEl(null)}
                 >
-                  <MenuItem
-                    component={Link}
-                    to="/profile"
-                    onClick={handleProfileMenuClose}
-                  >
+                  <MenuItem component={Link} to="/profile">
                     My Profile
                   </MenuItem>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
@@ -119,13 +105,21 @@ const Navbar = () => {
                 <Button color="inherit" component={Link} to="/register">
                   Register
                 </Button>
+                {/* 🔒 Hidden Company Login Button */}
+                <Button
+                  component={Link}
+                  to="/company-login"
+                  style={{ display: "none" }}
+                >
+                  Company Login
+                </Button>
               </>
             )}
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* ✅ Mobile Drawer (Sidebar) */}
+      {/* ✅ Mobile Drawer (Sidebar) - Fixed Visibility */}
       <Drawer anchor="left" open={mobileOpen} onClose={handleDrawerToggle}>
         <List sx={{ width: 250 }}>
           <ListItem component={Link} to="/" onClick={handleDrawerToggle}>
@@ -195,4 +189,5 @@ const Navbar = () => {
     </>
   );
 };
+
 export default Navbar;

@@ -7,6 +7,7 @@ import carRoutes from "./routes/carRoutes.js";
 import rentalRoutes from "./routes/rentalRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import { PORT } from "./config/envConfig.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 // ✅ Ensure `.env` is loaded first
 dotenv.config();
@@ -20,6 +21,8 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/cars", carRoutes);
 app.use("/api/rentals", rentalRoutes);
+// ✅ Register routes
+app.use("/api/admin", adminRoutes); // ✅ Ensure this exists
 
 // ✅ Use Global Error Handler
 app.use(errorHandler);

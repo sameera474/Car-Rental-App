@@ -1,24 +1,26 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 
-export const resetSystem = async (req, res) => {
+// ✅ Add Staff (Admin/Boss Only)
+export const addStaff = async (req, res) => {
   try {
-    await User.deleteMany({ role: { $ne: "admin" } });
-    res.json({ message: "System reset successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Error resetting system" });
-  }
-};
+    const { name, email, password, role } = req.body;
 
-export const manageBosses = async (req, res) => {
-  try {
-    const { userId, action } = req.body;
-    if (action === "promote") {
-      await User.findByIdAndUpdate(userId, { role: "boss" });
-    } else if (action === "demote") {
-      await User.findByIdAndUpdate(userId, { role: "manager" });
+    // ✅ Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
     }
-    res.json({ message: "Boss role updated" });
+
+    // ✅ Hash Password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ Create New User
+    const user = new User({ name, email, password: hashedPassword, role });
+    await user.save();
+
+    res.status(201).json({ message: "Staff registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error managing bosses" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

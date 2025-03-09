@@ -1,10 +1,18 @@
 import express from "express";
-import { resetSystem, manageBosses } from "../controllers/adminController.js";
-import { authenticate, isAdmin } from "../middleware/authMiddleware.js";
+import { addStaff } from "../controllers/adminController.js";
+import {
+  authenticateUser,
+  authorizeRole,
+} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/reset-system", authenticate, isAdmin, resetSystem);
-router.post("/manage-bosses", authenticate, isAdmin, manageBosses);
+// ✅ Only Admin or Boss can add staff
+router.post(
+  "/add-staff",
+  authenticateUser,
+  authorizeRole(["admin", "boss"]),
+  addStaff
+);
 
 export default router;

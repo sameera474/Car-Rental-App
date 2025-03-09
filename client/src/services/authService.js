@@ -25,11 +25,12 @@ export const registerUser = async (userData) => {
 };
 
 // ✅ Login User
-export const loginUser = async ({ email, password }) => {
+export const loginUser = async ({ email, password, role }) => {
   try {
     const credentials = {
       email: email.trim().toLowerCase(),
       password: password.toString().trim(),
+      role, // ✅ Include role in the request
     };
 
     console.log("📤 Sending Login Data:", credentials);

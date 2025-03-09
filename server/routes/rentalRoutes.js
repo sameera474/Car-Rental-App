@@ -3,13 +3,13 @@ import {
   rentCar,
   returnCar,
   getUserRentals,
-} from "../controllers/rentalController.js"; // ✅ Ensure correct import
-import { authenticate } from "../middleware/authMiddleware.js";
+} from "../controllers/rentalController.js";
+import { authenticateUser } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/rent", authenticate, rentCar);
-router.post("/return", authenticate, returnCar);
-router.get("/history/:userId", authenticate, getUserRentals);
+router.post("/rent", authenticateUser, rentCar);
+router.post("/return", authenticateUser, returnCar);
+router.get("/history/:userId", authenticateUser, getUserRentals);
 
-export default router; // ✅ Ensure default export
+export default router;
