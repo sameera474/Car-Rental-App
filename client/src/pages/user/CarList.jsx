@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,21 +9,22 @@ import {
   Container,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { getAvailableCars } from "../../services/carService";
 import MainLayout from "../../layouts/MainLayout";
-
-// Dummy Data (Replace with API call later)
-const carData = [
-  { id: 1, name: "Toyota Corolla", image: "/cars/corolla.jpg", price: 50 },
-  { id: 2, name: "BMW X5", image: "/cars/bmw.jpg", price: 120 },
-  { id: 3, name: "Honda Civic", image: "/cars/civic.jpg", price: 45 },
-];
 
 const CarList = () => {
   const [cars, setCars] = useState([]);
 
   useEffect(() => {
-    // TODO: Fetch from API later
-    setCars(carData);
+    const fetchCars = async () => {
+      try {
+        const data = await getAvailableCars();
+        setCars(data);
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+      }
+    };
+    fetchCars();
   }, []);
 
   return (

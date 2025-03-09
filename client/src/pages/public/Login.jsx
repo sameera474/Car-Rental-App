@@ -1,20 +1,26 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  Paper,
-} from "@mui/material";
-import { Link } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
+import { useNavigate } from "react-router-dom";
+import { TextField, Button, Container, Typography, Paper } from "@mui/material";
+import { loginUser } from "../../services/authService";
+import MainLayout from "../../layouts/MainLayout";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async () => {
+    try {
+      const data = await loginUser(credentials);
+      localStorage.setItem("token", data.token);
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Invalid login credentials. Please try again.");
+    }
   };
 
   return (
@@ -24,6 +30,7 @@ const Login = () => {
           <Typography variant="h4" gutterBottom textAlign="center">
             Login
           </Typography>
+          {error && <Typography color="error">{error}</Typography>}
           <TextField
             fullWidth
             label="Email"
@@ -41,14 +48,15 @@ const Login = () => {
             value={credentials.password}
             onChange={handleChange}
           />
-          <Button fullWidth variant="contained" color="primary" sx={{ mt: 2 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+            onClick={handleLogin}
+          >
             Login
           </Button>
-          <Box textAlign="center" sx={{ mt: 2 }}>
-            <Typography variant="body2">
-              Don't have an account? <Link to="/register">Register</Link>
-            </Typography>
-          </Box>
         </Paper>
       </Container>
     </MainLayout>

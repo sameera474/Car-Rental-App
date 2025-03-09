@@ -1,9 +1,9 @@
 import React from "react";
 import { Container, Typography, Paper, Box } from "@mui/material";
-import { BarChart } from "@mui/x-charts/BarChart";
+import { BarChart } from "@mui/x-charts";
+
 import MainLayout from "../../layouts/MainLayout";
 
-// Dummy Data (Replace with API later)
 const revenueData = [
   { month: "Jan", revenue: 10000 },
   { month: "Feb", revenue: 12000 },

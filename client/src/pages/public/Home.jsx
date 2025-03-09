@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, Button, Box, Container } from "@mui/material";
 import { Link } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
+import MainLayout from "../../layouts/MainLayout";
 
 const Home = () => {
   return (
